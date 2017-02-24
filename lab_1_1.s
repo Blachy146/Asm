@@ -41,15 +41,30 @@ start:
   movb BUFOR(%ecx,1), %bl
   cmpb $0, %bl
   jz end
-  cmpb $'a', %bl
-  jb next
-  cmpb $'z', %bl
-  ja next
-  subb $0x20, %bl
-  movb %bl, BUFOR(%ecx,1)
+  jmp checkIfLower
 next:
   inc %ecx
   jmp start
+checkIfLower:
+  cmpb $'a', %bl
+  jb checkIfUpper
+  cmp $'z', %bl
+  ja next
+  jmp toUpper
+checkIfUpper:
+  cmpb $'A', %bl
+  jb next
+  cmpb $'Z', %bl
+  ja next
+  jmp toLower
+toUpper:
+  subb $0x20, %bl
+  movb %bl, BUFOR(%ecx,1)
+  jmp next
+toLower:
+  addb $0x20, %bl
+  movb %bl, BUFOR(%ecx,1)
+  jmp next
 end:
   movl %ecx, %edx
   movl $BUFOR, %ecx
