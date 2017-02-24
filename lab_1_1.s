@@ -34,6 +34,7 @@ _start:
   movl $BUFOR, %ecx
   movl $buf_len, %edx
   int $SYSCALL
+
   movl $0x0, %ecx
 
 start:
