@@ -34,6 +34,27 @@ _start:
   movl $BUFOR, %ecx
   movl $buf_len, %edx
   int $SYSCALL
+  movl $0x0, %ecx
+
+start:
+  movb BUFOR(%ecx,1), %bl
+  cmpb $0, %bl
+  jz end
+  cmpb $'a', %bl
+  jb next
+  cmpb $'z', %bl
+  ja next
+  subb $0x20, %bl
+  movb %bl, BUFOR(%ecx,1)
+next:
+  inc %ecx
+  jmp start
+end:
+  movl %ecx, %edx
+  movl $BUFOR, %ecx
+  movl $STDOUT, %ebx
+  movl $WRITE, %eax
+  int $SYSCALL    
 
   movl $EXIT, %eax
   movl $EXIT_SUCCESS, %ebx
