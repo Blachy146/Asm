@@ -44,6 +44,7 @@ start:
   jmp checkIfLower
 next:
   inc %ecx
+  inc %ecx
   jmp start
 checkIfLower:
   cmpb $'a', %bl
