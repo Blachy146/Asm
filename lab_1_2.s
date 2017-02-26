@@ -5,51 +5,58 @@ STDOUT = 1
 STDIN = 0
 EXIT_SUCCESS = 0
 SYSCALL = 0x80
-BUFOR_SPACE = 10
+BUFOR_SPACE = 254
+SPACE = 32
 
-.section .data
-WELCOME_TEXT:
-  .ascii "Podaj ciag znakow(hex): "
-  welcome_text_len = . - WELCOME_TEXT
-BUFOR:
-  .space BUFOR_SPACE 
-  buf_len = . - BUFOR
-ENDL:
-  .ascii "\n"
-  endl_len = . - ENDL
-.comm NUMS, 4
-.comm TMP, 1
+.align 32 
+
+.data
+  .comm BUFOR, 100
+  .comm buf_len, 4
+  .comm NUMS, 4
+  .comm TMP, 1
+.text
+  WELCOME_TEXT:
+    .ascii "Podaj znaki(hex): "
+    welcome_text_len = . - WELCOME_TEXT
+  ENDL:
+    .ascii "\n"
+    endl_len = . - ENDL
 #--------------------------------------------
-.globl _start
+.global _start
 _start:
   #print message
-  movl $WELCOME_TEXT, %ecx
-  movl $welcome_text_len, %edx
+  mov $WELCOME_TEXT, %ecx
+  mov $welcome_text_len, %edx
   call COUT
   
   #read input
-  movl $BUFOR, %ecx
-  movl $buf_len, %edx
+  mov $BUFOR, %ecx
+  mov $100, %edx
   call CIN
-  movl %eax, buf_len
+  mov %eax, buf_len
   
   #strip buf_len
-  movl buf_len, %eax
-  subl $1, %eax
-  movl %eax, buf_len
+  mov buf_len, %eax
+  sub $1, %eax
+  mov %eax, buf_len
   
   #init vars
-  movl $1, %ecx
+  mov $1, %ecx
   movl $0, NUMS
 
   #scan bufor form the end store 4 bytes at separated memory adresses  
-  movl buf_len, %esi
+  mov buf_len, %esi
   sub $1, %esi
 FOR1:
   cmp $0, %esi
-  jl FOR1
+  jl END_FOR1
   
   #check if small or big letter or number
+  xor %eax, %eax
+  mov BUFOR(, %esi), %al
+  cmp $SPACE, %al
+je GOT_SPACE
   cmp $97, %al
   jge SMALL_LETTER            #got small letter
   cmp $65 ,%al
@@ -66,19 +73,34 @@ BIG_LETTER:
 STORE_VALUE:
   mul %ecx                     #val * m ???
   add %eax, NUMS
-
   movl %ecx, %eax              # m *= 16 ???
   movl $16, %edx
   mul %edx
   mov %eax ,%ecx
   jmp OUT 
 
+GOT_SPACE:
+  mov $1, %ecx
+
 OUT:
   dec %esi
   jmp FOR1
 
+END_FOR1:
+  mov NUMS, %eax
+  mov $2, %ebx
+  call PRINT_BASE
+  mov $8, %ebx
+  call PRINT_BASE
+  mov $10, %ebx
+  call PRINT_BASE
+  mov $16, %ebx
+  call PRINT_BASE
+  call PRINT_ENDL
 
-  jmp EXIT_PROG 
+  mov $EXIT, %eax
+  mov $EXIT_SUCCESS, %ebx
+  int $SYSCALL
 #---------------------------------------------
 COUT:
   movl $WRITE, %eax
@@ -92,7 +114,39 @@ CIN:
   int $SYSCALL
   ret
 
-EXIT_PROG:
-  movl $EXIT, %eax
-  movl $EXIT_SUCCESS, %ebx
-  int $SYSCALL
+PRINT_ENDL:
+  movl $ENDL, %ecx
+  movl $endl_len, %edx
+  call COUT
+  ret
+
+PRINT_BASE:
+  push %rax
+  xor %esi, %esi
+FOR3:
+  xor %edx, %edx
+  div %ebx
+  push %rdx
+  inc %esi
+  cmp $0, %eax
+  jne FOR3
+FOR4:
+  cmp $0, %esi
+  je END_FOR4
+  pop %rcx
+  cmp $10, %ecx
+  jl LESS
+  add $7, %ecx
+LESS:
+  add $48, %ecx
+  mov %ecx, TMP
+  mov $TMP, %ecx
+  mov $1, %edx
+  call COUT
+  dec %esi
+  jmp FOR4
+END_FOR4:
+  call PRINT_ENDL
+  pop %rax
+  ret
+
