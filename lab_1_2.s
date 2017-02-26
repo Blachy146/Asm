@@ -5,30 +5,39 @@ STDOUT = 1
 STDIN = 0
 EXIT_SUCCESS = 0
 SYSCALL = 0x80
-BUFOR_SPACE = 254
+BUFOR_SPACE = 4
 
 .section .data
 WELCOME_TEXT:
   .ascii "Podaj ciag znakow: "
   welcome_text_len = . - WELCOME_TEXT
 BUFOR:
-  .space BUFOR_SPACE
+  .space BUFOR_SPACE 
   buf_len = . - BUFOR
-
+ENDL:
+  .ascii "\n"
+#--------------------------------------------
 .globl _start
 _start:
-  movl $WRITE, %eax
-  movl $STDOUT, %ebx
   movl $WELCOME_TEXT, %ecx
   movl $welcome_text_len, %edx
-  int $SYSCALL
+  call PRINT
 
+  jmp EXIT_PROG 
+#---------------------------------------------
+PRINT:
+  movl $WRITE, %eax
+  movl $STDOUT, %ebx
+  int $SYSCALL
+  ret
+
+READ:
   movl $READ, %eax
   movl $STDIN, %ebx
-  movl $BUFOR, %ecx
-  movl $buf_len, %edx
   int $SYSCALL
+  ret
 
+EXIT_PROG:
   movl $EXIT, %eax
   movl $EXIT_SUCCESS, %ebx
   int $SYSCALL
