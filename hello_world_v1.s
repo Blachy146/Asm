@@ -1,4 +1,4 @@
-.data #poczatek danych
+.data poczatek danych
 napis: #etykieta napis widoczna tylko dla kodu programu (bez .global)
   .string "hello world!\n" #napis widoczny pod adresem etykiety
   len = . - napis #dlugosc napisu (. to aktualny adres w pamieci - koniec napisu)
