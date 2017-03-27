@@ -1,0 +1,249 @@
+SYSEXIT = 1
+
+EXIT_SUCCESS = 0
+
+SYSREAD = 3
+
+SYSWRITE = 4
+
+STDOUT = 1
+
+STDIN = 0
+
+SYSCALL = 0X80
+
+
+
+.data
+
+  HexBase:
+
+    .int 16
+
+  DecBase:
+
+    .int 10
+
+  
+
+  .comm NumOfChars, 4
+
+
+
+  Bufor:
+
+    .ascii "      "
+
+    buf_len = . - Bufor
+
+  Result:
+
+    .ascii "                       "
+
+    res_len = . - Result
+
+
+
+.text
+
+  Prompt:
+
+    .ascii "Podaj liczbe(hex): "
+
+    prompt_len = . - Prompt
+
+  NewLine:
+
+    .ascii "\n"
+
+    newLine_len = . - NewLine
+
+
+
+.global _start
+
+_start:
+
+  movl $Prompt, %ecx
+
+  movl $prompt_len, %edx
+
+  call COUT
+
+  
+
+  movl $Bufor, %ecx
+
+  movl $buf_len, %edx
+
+  call CIN
+
+
+
+  sub $2, %eax
+
+  movl %eax, NumOfChars
+
+
+
+  movl %eax, %edi
+
+  movl $0, %esi
+
+FOR_1:
+
+  cmp $0, %edi
+
+  jl END_FOR_1
+
+  movb Bufor(,%edi,1), %al
+
+  cmp $'9', %al
+
+  jbe gotNumber
+
+  cmp $'F', %al
+
+  jbe gotBigLetter
+
+  cmp $'f', %al
+
+  jbe gotSmallLetter
+
+  
+
+gotNumber:
+
+  subb $48, %al   
+
+  jmp NEXT
+
+
+
+gotBigLetter: 
+
+  subb $55, %al
+
+  jmp NEXT
+
+
+
+gotSmallLetter:
+
+  subb $87, %al
+
+  jmp NEXT
+
+
+
+NEXT:
+
+
+
+  movzx %al, %eax
+
+
+
+  movl NumOfChars, %ecx
+
+  subl %edi, %ecx
+
+MUL_LOOP:
+
+  cmp $0, %ecx
+
+  je INC_EDI
+
+  mull HexBase
+
+  dec %ecx
+
+  jmp MUL_LOOP
+
+
+
+INC_EDI:
+
+  movl %eax, Result(,%esi,4)
+
+  addl $4, %esi
+
+  dec %edi
+
+  jmp FOR_1
+
+
+
+END_FOR_1:
+
+  movl $0, %esi
+
+  movl $0, %ecx
+
+  movl $0, %eax
+
+END:
+
+  cmp NumOfChars, %ecx
+
+  ja PRINT_RES
+
+  movl Result(,%esi,4), %ebx
+
+  addl %ebx, %eax
+
+  addl $4, %esi
+
+  inc %ecx
+
+  jmp END 
+
+
+
+PRINT_RES:
+
+  movl $Result, %ecx
+
+  movl $res_len, %edx
+
+  call COUT
+
+
+
+  movl $NewLine, %ecx
+
+  movl $newLine_len, %edx
+
+  call COUT
+
+
+
+  movl $SYSEXIT, %eax
+
+  movl $EXIT_SUCCESS, %ebx
+
+  int $SYSCALL
+
+#------------------------------------
+
+COUT:
+
+  movl $SYSWRITE, %eax
+
+  movl $STDOUT, %ebx
+
+  int $SYSCALL
+
+  ret
+
+
+
+CIN:
+
+  movl $SYSREAD, %eax
+
+  movl $STDIN, %ebx
+
+  int $SYSCALL
+
+  ret
