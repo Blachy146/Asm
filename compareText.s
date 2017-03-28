@@ -12,7 +12,7 @@ BUFOR_SIZE = 16
 
 .text
 memory_string:
-  .ascii "Toyota Avensis 2"
+  .ascii "Napis testowy"
   memory_string_len = . - memory_string
 newline:
   .ascii "\n"
