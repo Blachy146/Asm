@@ -1,0 +1,150 @@
+SYSCALL = 0x80
+FILE_READ = 3
+EXIT_SUCCESS = 0
+EXIT = 1
+FILE_OPEN = 5
+
+.section .data
+  first_file:
+    .ascii "liczba_1.txt\0"
+  second_file:
+    .ascii "liczba_2.txt\0"
+  output_file:
+    .ascii "wynik_dodawania.txt\0"
+  newline:
+    .ascii "\n"
+    newline_len = . - newline
+
+.section .bss
+  .lcomm buffer1, 1024
+  .lcomm buffer2, 1024
+  .lcomm output, 1024
+  .lcomm filehandler_1, 4
+  .lcomm filehandler_2, 4
+  .lcomm number_of_chars_1, 4
+  .lcomm number_of_chars_2, 4
+  .lcomm carry, 4
+
+.section .text
+.global _start
+_start:
+#---------first_file_read---------------
+  movl $FILE_OPEN, %eax
+  movl $first_file, %ebx
+  movl $00, %ecx
+  movl $0444, %edx
+  int $SYSCALL
+
+  test %eax, %eax
+  js badfile
+  movl %eax, filehandler_1
+
+  movl $FILE_READ, %eax
+  movl filehandler_1, %ebx
+  movl $buffer1, %ecx
+  movl $1024, %edx
+  int $SYSCALL
+
+  test %eax, %eax
+  js badfile
+
+  subl $2, %eax
+  movl %eax, number_of_chars_1
+
+  movl $6, %eax
+  movl filehandler_1, %ebx
+  int $SYSCALL
+#-----------second_file_read-----------------------
+  movl $FILE_OPEN, %eax
+  movl $second_file, %ebx
+  movl $00, %ecx
+  movl $0444, %edx
+  int $SYSCALL
+
+  test %eax, %eax
+  js badfile
+  movl %eax, filehandler_2
+
+  movl $FILE_READ, %eax
+  movl filehandler_2, %ebx
+  movl $buffer2, %ecx
+  movl $1024, %edx
+  int $SYSCALL
+
+  test %eax, %eax
+  js badfile
+
+  subl $2, %eax
+  movl %eax, number_of_chars_2
+
+  movl $6, %eax
+  movl filehandler_2, %ebx
+  int $SYSCALL
+#-------------print_buffors---------
+  movl $4, %eax
+  movl $1, %ebx
+  movl $buffer1, %ecx
+  movl number_of_chars_1, %edx
+  int $SYSCALL
+
+  movl $4, %eax
+  movl $1, %ebx
+  movl $buffer2, %ecx
+  movl number_of_chars_2, %edx
+  int $SYSCALL
+#------------add_numbers--------------  
+  movl number_of_chars_1, %edi
+  movl number_of_chars_2, %esi
+  movl $0, %eax
+  movl $0, %ebx
+  movl $0, %ecx
+  movl $0, carry
+ADD_SINGLE_NUMBERS:
+  cmp $0, %edi
+  jl CMP_SECOND
+START:
+  movb buffer1(,%edi,1), %al
+  movb buffer2(,%esi,1), %bl 
+  subb $'0', %al
+  subb $'0', %bl
+  movzx %al, %eax
+  movzx %bl, %ebx
+  addl %ebx, %eax
+  addl carry, %eax
+  cmp $3, %eax
+  ja MORE_THAN_MAX 
+  movl $0, carry
+  addl $'0', %eax
+  movb %al, output(,%ecx,1)
+  jmp INC_AND_DEC
+
+MORE_THAN_MAX:
+  movl $1, carry
+  subl $4, %eax
+  addl $'0', %eax
+  movb %al, output(,%ecx,1)
+  jmp INC_AND_DEC
+  
+INC_AND_DEC:
+  inc %ecx
+  dec %edi
+  dec %esi
+  jmp ADD_SINGLE_NUMBERS
+  
+CMP_SECOND:
+  cmp $0, %esi
+  jl END
+  jmp START 
+
+#-------------end---------------------
+END:
+  movl carry, %eax
+  addl $'0', %eax
+  movb %al, output(,%ecx,1)
+badfile:
+  movl %eax, %ebx
+  movl $1, %eax
+  int $SYSCALL
+
+
+#--------------zapis_do output_szesnastkowo---------------
