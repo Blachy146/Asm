@@ -80,7 +80,6 @@ TO_MUCH_LOWER:
   subl $16, %eax
   movl $1, carry
   pushq %rax
-  inc %edi
   jmp GET_UPPER 
 
 TO_MUCH_UPPER:
@@ -96,6 +95,7 @@ END_FOR1:
 END_PROGRAM:
   cmp $1, carry
   je ADD_LAST_CARRY
+  jmp END
 ADD_LAST_CARRY:
   movl $1, %eax
   pushq %rax
