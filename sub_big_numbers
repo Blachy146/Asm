@@ -1,0 +1,107 @@
+SYSEXIT = 1
+EXIT_SUCCESS = 0
+SYSWRITE = 4
+SYSREAD = 3
+STDOUT = 1
+STDIN = 0
+SYSCALL = 0X80
+
+.section .data
+  liczba1:
+    .long 0xF2345671
+  liczba2:
+    .long 0x21111118
+  hex_base:
+    .int 16
+.section .bss
+  .lcomm carry, 4
+
+.section .text
+.global _start
+_start:
+  movl $0, %edi
+  movl $0, carry
+  movl $16, hex_base
+FOR1:
+#pobranie po 2 liczby
+  movl $0, %eax
+  movl $0, %ebx
+  cmp $3, %edi
+  ja END_FOR1
+
+  movb liczba1(,%edi,1), %al
+  movb liczba2(,%edi,1), %bl
+
+GET_LOWER:
+  salb $4, %al
+  salb $4, %bl
+  sarl $4, %eax
+  sarl $4, %ebx
+
+ADD_LOWER:
+  movzx %al, %eax
+  movzx %bl, %ebx
+  subl %ebx, %eax
+  subl carry, %eax
+  cmp $0, %eax
+  jl LESS_THAN_ZERO
+  movl $0, carry
+  pushq %rax
+ 
+GET_UPPER:
+  movl $0, %ecx
+  movl $0, %eax
+  movl $0, %edx
+
+  movb liczba1(,%edi,1), %al
+  movb liczba2(,%edi,1), %bl
+
+  divl hex_base
+  movzx %al, %eax
+  movl %eax, %ecx
+  movl $0, %eax
+  movl $0, %edx
+  movzx %bl, %ebx
+  movl %ebx, %eax
+  divl hex_base
+  movzx %al, %eax
+  movl %ecx, %ebx
+
+  xchg %ebx, %eax  
+  subl %ebx, %eax
+  subl carry, %eax
+  cmp $0, %eax
+  jl LESS_THAN_ZERO_UPPER
+  pushq %rax
+  movl $0, carry
+  inc %edi
+  jmp FOR1
+
+LESS_THAN_ZERO:
+  addl $16, %eax
+  movl $1, carry
+  pushq %rax
+  jmp GET_UPPER 
+
+LESS_THAN_ZERO_UPPER:
+  addl $16, %eax
+  movl $1, carry
+  pushq %rax
+  inc %edi
+  jmp FOR1 
+  
+END_FOR1:
+  jmp END_PROGRAM
+
+END_PROGRAM:
+  cmp $1, carry
+  je ADD_LAST_CARRY
+  jmp END
+ADD_LAST_CARRY:
+  movl $0xFFFFFFFF, %eax
+  pushq %rax
+  jmp END
+END:
+  movl $SYSEXIT, %eax
+  movl $EXIT_SUCCESS, %ebx
+  int $SYSCALL
