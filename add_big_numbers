@@ -1,36 +1,59 @@
+SYSCALL = 0x80
 SYSEXIT = 1
 EXIT_SUCCESS = 0
-SYSWRITE = 4
-SYSREAD = 3
-STDOUT = 1
-STDIN = 0
-SYSCALL = 0X80
 
 .section .data
   liczba1:
-    .long 0xF2345678
+    .long 0xF2345678, 0xF2740281
+    liczba1_len  = . - liczba1
   liczba2:
-    .long 0x21111111
-  hex_base:
-    .int 16
+    .long 0x12211121, 0x21213211
+    liczba2_len  = . - liczba2
 .section .bss
+  .lcomm hex_base, 4
   .lcomm carry, 4
+  .lcomm number_of_doubles, 4
+  .lcomm part_number1, 4
+  .lcomm part_number2, 4
 
 .section .text
 .global _start
 _start:
-  movl $0, %edi
-  movl $0, carry
   movl $16, hex_base
-FOR1:
-#pobranie po 2 liczby
+  movl $0, carry
+
+#get number of doubles
+  movl $0, %edx
+  movl $0, %ecx
+  movl $liczba1_len, %eax
+  movl $8, %ecx
+  divl %ecx
+  movl %eax, number_of_doubles 
+
+#read parts of numbers
   movl $0, %eax
   movl $0, %ebx
-  cmp $3, %edi
-  ja END_FOR1
+  movl number_of_doubles, %edi
+READ_PARTS:
+  movl $0, %esi
+  cmp $0, %edi
+  jl END 
+  movl liczba1(,%edi,4), %eax
+  movl liczba2(,%edi,4), %ebx
+  movl %eax, part_number1
+  movl %ebx, part_number2
+  jmp GET_NUMBERS_FOR_OPERATIONS
 
-  movb liczba1(,%edi,1), %al
-  movb liczba2(,%edi,1), %bl
+GET_NUMBERS_FOR_OPERATIONS:
+#pobranie po 2 liczby
+FOR1:
+  movl $0, %eax
+  movl $0, %ebx
+  cmp $4, %esi
+  jae END_FOR1
+
+  movb part_number1(,%esi,1), %al
+  movb part_number2(,%esi,1), %bl
 
 GET_LOWER:
   salb $4, %al
@@ -44,7 +67,7 @@ ADD_LOWER:
   addl %ebx, %eax
   addl carry, %eax
   cmp $15, %eax
-  ja TO_MUCH_LOWER
+  ja MAX_LOWER
   movl $0, carry
   pushq %rax
  
@@ -53,8 +76,8 @@ GET_UPPER:
   movl $0, %eax
   movl $0, %edx
 
-  movb liczba1(,%edi,1), %al
-  movb liczba2(,%edi,1), %bl
+  movb part_number1(,%esi,1), %al
+  movb part_number2(,%esi,1), %bl
 
   divl hex_base
   movzx %al, %eax
@@ -66,41 +89,45 @@ GET_UPPER:
   divl hex_base
   movzx %al, %eax
   movl %ecx, %ebx
-  
+
+  xchg %ebx, %eax  
   addl %ebx, %eax
   addl carry, %eax
   cmp $15, %eax
-  ja TO_MUCH_UPPER
+  ja MAX_UPPER
   pushq %rax
   movl $0, carry
-  inc %edi
+  inc %esi
   jmp FOR1
 
-TO_MUCH_LOWER:
+MAX_LOWER:
   subl $16, %eax
   movl $1, carry
   pushq %rax
   jmp GET_UPPER 
 
-TO_MUCH_UPPER:
+MAX_UPPER:
   subl $16, %eax
   movl $1, carry
   pushq %rax
-  inc %edi
+  inc %esi
   jmp FOR1 
   
 END_FOR1:
+  dec %edi
+  jmp READ_PARTS 
+
+END:
+  cmp $0, carry
+  ja ADD_LAST_CARRY
+  jmp END_PROGRAM
+
+ADD_LAST_CARRY:
+  movl carry, %eax
+  pushq %rax
   jmp END_PROGRAM
 
 END_PROGRAM:
-  cmp $1, carry
-  je ADD_LAST_CARRY
-  jmp END
-ADD_LAST_CARRY:
-  movl $1, %eax
-  pushq %rax
-  jmp END
-END:
   movl $SYSEXIT, %eax
   movl $EXIT_SUCCESS, %ebx
   int $SYSCALL
