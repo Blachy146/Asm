@@ -1,0 +1,149 @@
+#include<stdio.h>
+#include<stdint.h>
+#include <time.h>
+#include <math.h>
+
+typedef struct vector4 {   
+    float x, y, z, w;       
+} vector4;
+
+// Set values to a vector4
+vector4 set_vector(float x, float y, float z, float w) {
+    vector4 ret_vector = { x, y, z, w };
+    return ret_vector;
+}
+
+vector4 sse_vector4_add(const vector4 *op_a, const vector4 *op_b)
+{
+	vector4 ret_vector;
+	int x, y;
+	asm(
+		 "movl %1, %%eax\n\t"
+   	 	 "movl %2, %%ebx\n\t"
+    		 "movups (%%eax),%%XMM0 \n\t"
+   		 "movups (%%ebx),%%XMM1 \n\t"
+		 "addps %%XMM1,%%XMM0 \n\t"
+    		 "movups %%XMM0,%0"
+   		 :"=g"(ret_vector) //Out variable
+   		 :"g"(op_a) , "g"(op_b) //in variable
+		 :"eax","ebx"
+		);
+   return ret_vector;
+}
+// Use sse to subtract the elements of two vectors a - b
+vector4 sse_vector4_subtract(const vector4 *op_a, const vector4 *op_b)
+{
+	vector4 ret_vector;
+	asm 
+	(		
+		 "movl %1, %%eax\n\t"
+   	 	 "movl %2, %%ebx\n\t"
+    		 "movups (%%eax),%%XMM0 \n\t"
+   		 "movups (%%ebx),%%XMM1 \n\t"
+		 "subps %%XMM1,%%XMM0 \n\t"
+    		 "movups %%XMM0,%0"
+   		 :"=g"(ret_vector) //Out variable
+   		 :"g"(op_a) , "g"(op_b) //in variable
+		 :"eax","ebx"
+	);
+	return ret_vector;
+}
+// Use sse to multiply vectors.
+vector4 sse_vector4_multiply(const vector4 *op_a, const vector4 *op_b)
+{
+	vector4 ret_vector;
+	asm 
+	(		
+		 "movl %1, %%eax\n\t"
+   	 	 "movl %2, %%ebx\n\t"
+    		 "movups (%%eax),%%XMM0 \n\t"
+   		 "movups (%%ebx),%%XMM1 \n\t"
+		 "mulps %%XMM1,%%XMM0 \n\t"
+    		 "movups %%XMM0,%0"
+   		 :"=g"(ret_vector) //Out variable
+   		 :"g"(op_a) , "g"(op_b) //in variable
+		 :"eax","ebx"
+	);
+	return ret_vector;
+}
+
+vector4 sse_vector4_divide(const vector4 *op_a, const vector4 *op_b)
+{
+	vector4 ret_vector;
+	asm 
+	(		
+		 "movl %1, %%eax\n\t"
+   	 	 "movl %2, %%ebx\n\t"
+    		 "movups (%%eax),%%XMM0 \n\t"
+   		 "movups (%%ebx),%%XMM1 \n\t"
+		 "divps %%XMM1,%%XMM0 \n\t"
+    		 "movups %%XMM0,%0"
+   		 :"=g"(ret_vector) //Out variable
+   		 :"g"(op_a) , "g"(op_b) //in variable
+		 :"eax","ebx"
+	);
+	return ret_vector;
+}
+// Print the vector elements with a leading caption
+void print_vector(const vector4* v)
+{	
+
+	printf ("%.1f ", v->x);
+	printf ("%.1f ", v->y);
+	printf ("%.1f ", v->z);
+	printf ("%.1f \n", v->w);
+}
+
+int main() {
+float licz = 0;
+vector4 tab[8192];
+tab[0].x =10;
+
+clock_t t;
+for (int i=0;i<8192;i++)
+{
+tab[i].x=rand();
+tab[i].y=rand();
+tab[i].z=rand();
+tab[i].w=rand();
+}
+
+//dodawanie
+for(int i=0;i<10;i++)
+{
+for (int i=0;i<2048;i++)
+{
+	vector4 a = set_vector(tab[i].x,tab[i].y,tab[i].z,tab[i].w);
+	vector4 b = set_vector(tab[i+1].x,tab[i+1].y,tab[i+1].z,tab[i+1].w);
+	vector4 c = sse_vector4_add(&a, &b);
+}
+
+}
+
+//odejmowanie
+licz=0;
+t = clock();
+for(int i=0;i<10;i++)
+{
+for (int i=0;i<2048;i++)
+{
+	vector4 a = set_vector(tab[i].x,tab[i].y,tab[i].z,tab[i].w);
+	vector4 b = set_vector(tab[i+1].x,tab[i+1].y,tab[i+1].z,tab[i+1].w);
+	vector4 c = sse_vector4_subtract(&a, &b);
+}
+t = clock() - t;
+licz +=t;
+}
+printf("%f \n \n",((float)licz/10)/CLOCKS_PER_SEC);
+ 	vector4 a = set_vector(2,2,2,2);
+	vector4 b = set_vector(4,2,4,2);
+	vector4 d = sse_vector4_subtract(&a, &b);
+	print_vector(&d);
+	vector4 e = sse_vector4_multiply(&a, &b);
+	print_vector(&e);
+	vector4 f = sse_vector4_divide(&a, &b);
+	print_vector(&f);
+
+    getchar();
+return 0;
+}
