@@ -1,0 +1,8 @@
+all: asm_with_c_print
+	make clean
+
+asm_with_c_print: asm_with_c_print.s
+	gcc -m32 -o asm_with_c_print asm_with_c_print.s -g c_functions.c
+
+clean:
+	rm -f *.o *~
