@@ -1,0 +1,66 @@
+.data
+  format_d:
+    .asciz "%d\0"
+  format_f: 
+    .asciz "%f\0" 
+  nowa_linia:
+    .asciz "\n\0"
+  val1:
+    .int 10
+  val2: 
+    .float 2.3
+  val3:
+    .double 1.99
+
+.text
+.global main
+main:
+#------add two ints and print------------------
+  mov val1, %rdi
+  mov val1, %rsi
+  call addInts  
+BREAK1:
+  
+  mov $format_d, %rdi
+  mov %rax, %rsi
+  mov $0, %rax
+  call printf
+
+  mov $0, %rax
+  mov $nowa_linia, %rdi
+  call printf
+#---------------------------------------------
+
+#----add two floats and print----------------- 
+  mov $2, %rax
+  movss val2, %xmm0
+  movss val2, %xmm1
+  call addFloats
+
+  mov $1, %rax 
+  cvtps2pd %xmm0, %xmm0
+  mov $format_f, %rdi
+  sub $8, %rsp
+  call printf
+
+  mov $0, %rax
+  mov $nowa_linia, %rdi
+  call printf
+#---------------------------------------------
+
+#----add two doubles and print----------------- 
+  mov $2, %rax
+  movsd val3, %xmm0
+  movsd val3, %xmm1
+  call addDoubles
+
+  mov $1, %rax              #konwersja nie potrzebna 
+  mov $format_f, %rdi
+  sub $16, %rsp
+  call printf
+
+  mov $0, %rax
+  mov $nowa_linia, %rdi
+  call printf
+#---------------------------------------------
+  call exit
