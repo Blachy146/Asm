@@ -9,6 +9,9 @@ int main()
   float c = 1.3;
   float d = 2.0;
   float sum_float = 0.0;
+  double e = 9.99;
+  double f = 10.39;
+  double sum_double = 0;
 
 //-----------adding ints--------------------------
   asm(
@@ -40,4 +43,18 @@ int main()
  printf("%f\n", sum_float);
 
 //--------adding doules-------------------------
+  asm(
+      "movsd %1, %%xmm0 \n"
+      "movsd %2, %%xmm1 \n"
+      "addsd %%xmm1, %%xmm0 \n"
+      "movq %%xmm0, %%rax \n"
+      "mov %%rax, %0 \n"
+
+      : "=g"(sum_double)
+      : "g"(e),"g"(f)
+      : "%rax"
+     );
+
+ printf("%f\n", sum_double);
+
 }
