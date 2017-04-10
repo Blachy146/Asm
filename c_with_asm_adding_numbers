@@ -1,0 +1,43 @@
+#include <stdio.h>
+
+
+int main()
+{
+  int a = 1;
+  int b = 2;
+  int sum_int = 0;
+  float c = 1.3;
+  float d = 2.0;
+  float sum_float = 0.0;
+
+//-----------adding ints--------------------------
+  asm(
+      "mov %1, %%eax \n"
+      "mov %2, %%ebx \n"
+      "add %%ebx, %%eax \n"
+      "mov %%eax, %0 \n"
+ 
+      : "=r"(sum_int)
+      : "r"(a),"r"(b)
+      : "%eax", "%ebx"
+     );
+
+  printf("%d\n", sum_int);
+
+//----------adding floats-------------------------
+  asm(
+      "movss %1, %%xmm0 \n"
+      "movss %2, %%xmm1 \n"
+      "addss %%xmm1, %%xmm0 \n"
+      "movq %%xmm0, %%rax \n"
+      "mov %%eax, %0 \n"
+
+      : "=g"(sum_float)
+      : "g"(c),"g"(d)
+      : "%rax"
+     );
+
+ printf("%f\n", sum_float);
+
+//--------adding doules-------------------------
+}
