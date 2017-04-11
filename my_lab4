@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+
+typedef struct { int a, b, c, d; } int_vec;
+
+typedef struct { float a, b, c, d; } float_vec;
+
+typedef struct { double a, b, c, d; } double_vec;
+
+
+int_vec set_int_vec(int a, int b, int c, int d)
+{
+  int_vec v = {a,b,c,d};
+  return v;
+}
+
+float_vec set_float_vec(float a, float b, float c, float d)
+{
+  float_vec v = {a,b,c,d};
+  return v;
+}
+
+double_vec set_double_vec(double a, double b, double c, double d)
+{
+  double_vec v = {a,b,c,d};
+  return v;
+}
+
+int randInt()
+{
+  return (rand() % 10000) + 0; 
+}
+
+float randFloat()
+{
+  return ((float)rand()/(float)(RAND_MAX)) * 100;
+}
+
+double randDouble()
+{
+  return ((double)rand()/(double)(RAND_MAX)) * 100;
+}
+
+
+int main()
+{
+  const int NUMBER_OF_NUMBERS = 2048;
+
+  //for(int i = 0; i < 10; ++i)
+    //printf("Liczba int: %d\n", randInt());
+  
+  //for(int i = 0; i < 10; ++i)
+   // printf("Liczba float: %f\n", randFloat());
+
+  //for(int i = 0; i < 10; ++i)
+    //printf("Liczba double: %f\n", randDouble());
+
+
+
+}
