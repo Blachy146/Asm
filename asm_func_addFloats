@@ -1,0 +1,15 @@
+.data
+
+.text
+.global addFloats
+.type addFloats, @function
+
+addFloats:
+  push %rbp
+  mov %rsp, %rbp
+
+  addss %xmm1, %xmm0
+
+  mov %rbp, %rsp
+  pop %rbp
+ret
