@@ -1,0 +1,38 @@
+#include <stdio.h>
+
+extern int addInts(int a, int b);
+extern float addFloats(float a, float b);
+extern double addDoubles(double a, double b);
+
+
+int main()
+{
+  int a = 1;
+  int b = 2;
+  int sum_int = 0;
+  float c = 2.43;
+  float d = 1.33;
+  float sum_float = 0.0;
+  double e = 99.43;
+  double f = 15.11;
+  double sum_double = 0.0;
+
+//--------add ints-------------------
+  sum_int = addInts(a, b);
+
+  printf("%d\n", sum_int);
+//-----------------------------------
+
+//--------add floats-------------------
+  sum_float = addFloats(c, d);
+
+  printf("%f\n", sum_float);
+//-----------------------------------
+   
+//--------add doubles-------------------
+  sum_double = addDoubles(e, f);
+
+  printf("%f\n", sum_double);
+//-----------------------------------
+
+}
