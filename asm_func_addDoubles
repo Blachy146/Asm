@@ -1,0 +1,15 @@
+.data
+
+.text
+.global addDoubles
+.type addDoubles, @function
+
+addDoubles:
+  push %rbp
+  mov %rsp, %rbp
+
+  addsd %xmm1, %xmm0
+
+  mov %rbp, %rsp
+  pop %rbp
+  ret
