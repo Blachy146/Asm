@@ -8,7 +8,7 @@ typedef struct { float a, b, c, d; } float_vec;
 
 typedef struct { double a, b, c, d; } double_vec;
 
-
+//-------------set functions-------------------
 int_vec set_int_vec(int a, int b, int c, int d)
 {
   int_vec v = {a,b,c,d};
@@ -26,7 +26,7 @@ double_vec set_double_vec(double a, double b, double c, double d)
   double_vec v = {a,b,c,d};
   return v;
 }
-
+//------------rand single values-----------------
 int randInt()
 {
   return (rand() % 10000) + 0; 
@@ -41,21 +41,50 @@ double randDouble()
 {
   return ((double)rand()/(double)(RAND_MAX)) * 100;
 }
+//-----------create filled arrays-------------------
+int_vec createIntVec()
+{
+  return set_int_vec(randInt(), randInt(), randInt(), randInt());
+}
+
+float_vec createFloatVec()
+{
+  return set_float_vec(randFloat(), randFloat(), randFloat(), randFloat());
+}
+
+double_vec createDoubleVec()
+{
+  return set_double_vec(randDouble(), randDouble(), randDouble(), randDouble());
+}
+
+//------------operations-------------------
+int_vec addIntVec(int_vec v1, int_vec v2)
+{
+  int_vec result;
+
+  asm(
+      "movups %1, %%xmm0 \n"
+      "movups %2, %%xmm1 \n"
+      "addps %%xmm1, %%xmm0 \n"
+      "movups %%xmm0, %0 \n"
+
+      : "=g"(result)
+      : "g"(v1), "g"(v2)
+      :
+     );
+
+  printf("%d,", result.a);
+  printf("%d,", result.b);
+  printf("%d,", result.c);
+  printf("%d\n", result.d);
+
+  return result;
+}
 
 
 int main()
 {
   const int NUMBER_OF_NUMBERS = 2048;
 
-  //for(int i = 0; i < 10; ++i)
-    //printf("Liczba int: %d\n", randInt());
   
-  //for(int i = 0; i < 10; ++i)
-   // printf("Liczba float: %f\n", randFloat());
-
-  //for(int i = 0; i < 10; ++i)
-    //printf("Liczba double: %f\n", randDouble());
-
-
-
 }
