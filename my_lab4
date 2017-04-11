@@ -81,10 +81,130 @@ int_vec addIntVec(int_vec v1, int_vec v2)
   return result;
 }
 
+float_vec addFloatVec(float_vec v1, float_vec v2)
+{
+  float_vec result;
 
+  asm(
+      "movups %1, %%xmm0 \n"
+      "movups %2, %%xmm1 \n"
+      "addps %%xmm1, %%xmm0 \n"
+      "movups %%xmm0, %0 \n"
+
+      : "=g"(result)
+      : "g"(v1), "g"(v2)
+      :
+     );
+
+  printf("%f,", result.a);
+  printf("%f,", result.b);
+  printf("%f,", result.c);
+  printf("%f\n", result.d);
+
+  return result;
+}
+
+double_vec addDoubleVec(double_vec v1, double_vec v2)
+{
+  double_vec result;
+
+  asm(
+      "movups %1, %%xmm0 \n"
+      "movups %2, %%xmm1 \n"
+      "addps %%xmm1, %%xmm0 \n"
+      "movups %%xmm0, %0 \n"
+
+      : "=g"(result)
+      : "g"(v1), "g"(v2)
+      :
+     );
+
+  printf("%f,", result.a);
+  printf("%f,", result.b);
+  printf("%f,", result.c);
+  printf("%f\n", result.d);
+
+  return result;
+}
+
+
+
+int_vec SubIntVec(int_vec v1, int_vec v2)
+{
+  int_vec result;
+
+  asm(
+      "movups %1, %%xmm0 \n"
+      "movups %2, %%xmm1 \n"
+      "subps %%xmm1, %%xmm0 \n"
+      "movups %%xmm0, %0 \n"
+
+      : "=g"(result)
+      : "g"(v1), "g"(v2)
+      :
+     );
+
+  printf("%d,", result.a);
+  printf("%d,", result.b);
+  printf("%d,", result.c);
+  printf("%d\n", result.d);
+
+  return result;
+}
+
+float_vec SubFloatVec(float_vec v1, float_vec v2)
+{
+  float_vec result;
+
+  asm(
+      "movups %1, %%xmm0 \n"
+      "movups %2, %%xmm1 \n"
+      "subps %%xmm1, %%xmm0 \n"
+      "movups %%xmm0, %0 \n"
+
+      : "=g"(result)
+      : "g"(v1), "g"(v2)
+      :
+     );
+
+  printf("%f,", result.a);
+  printf("%f,", result.b);
+  printf("%f,", result.c);
+  printf("%f\n", result.d);
+
+  return result;
+}
+
+double_vec SubDoubleVec(double_vec v1, double_vec v2)
+{
+  double_vec result;
+
+  asm(
+      "movups %1, %%xmm0 \n"
+      "movups %2, %%xmm1 \n"
+      "subps %%xmm1, %%xmm0 \n"
+      "movups %%xmm0, %0 \n"
+
+      : "=g"(result)
+      : "g"(v1), "g"(v2)
+      :
+     );
+
+  printf("%f,", result.a);
+  printf("%f,", result.b);
+  printf("%f,", result.c);
+  printf("%f\n", result.d);
+
+  return result;
+}
+//---------------------------------------------------
 int main()
 {
   const int NUMBER_OF_NUMBERS = 2048;
-
+  
+  int_vec iv = createIntVec();
+  float_vec fv = createFloatVec();
+  addIntVec(iv, iv);
+  addFloatVec(fv, fv);
   
 }
