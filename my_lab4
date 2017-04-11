@@ -329,7 +329,7 @@ double_vec divDoubleVec(double_vec v1, double_vec v2)
       : "=g"(result)
       : "g"(v1), "g"(v2)
       :
-     );
+      );
 
   printf("%f,", result.a);
   printf("%f,", result.b);
@@ -338,13 +338,34 @@ double_vec divDoubleVec(double_vec v1, double_vec v2)
 
   return result;
 }
-//---------------------------------------------------
+//------counting time--------------------------------------
+double addingIntVecTime(const int NUMBER_OF_NUMBERS)
+{
+  double time_sum = 0.0;
+  clock_t t;
+for(int j = 0; j < 10; ++j)
+{
+  for(int i = 0; i < NUMBER_OF_NUMBERS; ++i)
+  {
+    int_vec v1 = createIntVec();
+    int_vec v2 = createIntVec();
+    t = clock();
+    addIntVec(v1, v2);
+    t = clock() - t;
+    time_sum += ((double)t)/CLOCKS_PER_SEC;
+  }
+}
+  time_sum /= 10;
+  return time_sum;
+}
+
 int main()
 {
-  const int NUMBER_OF_NUMBERS = 2048;
+  const int NUMBER_OF_NUMBERS = 8192;
   
   int_vec iv = createIntVec();
   float_vec fv = createFloatVec();
+
   printf("add\n");
   addIntVec(iv, iv);
   addFloatVec(fv, fv);
@@ -357,5 +378,7 @@ int main()
   printf("div\n");
   divIntVec(iv, iv);
   divFloatVec(fv, fv);
+
+  printf("Ints adding time : %f\n", addingIntVecTime(NUMBER_OF_NUMBERS));
   
 }
