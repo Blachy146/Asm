@@ -1,0 +1,16 @@
+.data
+
+.text
+.global addInts
+.type addInts, @function
+
+addInts:
+  push %rbp
+  mov %rsp, %rbp
+
+  add %rsi, %rdi
+  mov %rdi, %rax
+
+  mov %rbp, %rsp
+  pop %rbp
+ret
