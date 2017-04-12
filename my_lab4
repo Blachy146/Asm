@@ -73,10 +73,6 @@ int_vec addIntVec(int_vec v1, int_vec v2)
       :
      );
 
-  printf("%d,", result.a);
-  printf("%d,", result.b);
-  printf("%d,", result.c);
-  printf("%d\n", result.d);
 
   return result;
 }
@@ -96,10 +92,6 @@ float_vec addFloatVec(float_vec v1, float_vec v2)
       :
      );
 
-  printf("%f,", result.a);
-  printf("%f,", result.b);
-  printf("%f,", result.c);
-  printf("%f\n", result.d);
 
   return result;
 }
@@ -119,10 +111,6 @@ double_vec addDoubleVec(double_vec v1, double_vec v2)
       :
      );
 
-  printf("%f,", result.a);
-  printf("%f,", result.b);
-  printf("%f,", result.c);
-  printf("%f\n", result.d);
 
   return result;
 }
@@ -144,10 +132,6 @@ int_vec subIntVec(int_vec v1, int_vec v2)
       :
      );
 
-  printf("%d,", result.a);
-  printf("%d,", result.b);
-  printf("%d,", result.c);
-  printf("%d\n", result.d);
 
   return result;
 }
@@ -167,10 +151,6 @@ float_vec subFloatVec(float_vec v1, float_vec v2)
       :
      );
 
-  printf("%f,", result.a);
-  printf("%f,", result.b);
-  printf("%f,", result.c);
-  printf("%f\n", result.d);
 
   return result;
 }
@@ -190,10 +170,6 @@ double_vec subDoubleVec(double_vec v1, double_vec v2)
       :
      );
 
-  printf("%f,", result.a);
-  printf("%f,", result.b);
-  printf("%f,", result.c);
-  printf("%f\n", result.d);
 
   return result;
 }
@@ -215,10 +191,6 @@ int_vec mulIntVec(int_vec v1, int_vec v2)
       :
      );
 
-  printf("%d,", result.a);
-  printf("%d,", result.b);
-  printf("%d,", result.c);
-  printf("%d\n", result.d);
 
   return result;
 }
@@ -238,10 +210,6 @@ float_vec mulFloatVec(float_vec v1, float_vec v2)
       :
      );
 
-  printf("%f,", result.a);
-  printf("%f,", result.b);
-  printf("%f,", result.c);
-  printf("%f\n", result.d);
 
   return result;
 }
@@ -261,10 +229,6 @@ double_vec mulDoubleVec(double_vec v1, double_vec v2)
       :
      );
 
-  printf("%f,", result.a);
-  printf("%f,", result.b);
-  printf("%f,", result.c);
-  printf("%f\n", result.d);
 
   return result;
 }
@@ -285,10 +249,6 @@ int_vec divIntVec(int_vec v1, int_vec v2)
       :
      );
 
-  printf("%d,", result.a);
-  printf("%d,", result.b);
-  printf("%d,", result.c);
-  printf("%d\n", result.d);
 
   return result;
 }
@@ -308,10 +268,6 @@ float_vec divFloatVec(float_vec v1, float_vec v2)
       :
      );
 
-  printf("%f,", result.a);
-  printf("%f,", result.b);
-  printf("%f,", result.c);
-  printf("%f\n", result.d);
 
   return result;
 }
@@ -331,10 +287,6 @@ double_vec divDoubleVec(double_vec v1, double_vec v2)
       :
       );
 
-  printf("%f,", result.a);
-  printf("%f,", result.b);
-  printf("%f,", result.c);
-  printf("%f\n", result.d);
 
   return result;
 }
@@ -359,26 +311,38 @@ for(int j = 0; j < 10; ++j)
   return time_sum;
 }
 
+double addingFloatVecTime(const int NUMBER_OF_NUMBERS)
+{
+  double time_sum = 0.0;
+  clock_t t;
+  for(int j = 0; j < 10; ++j)
+  {
+    for(int i = 0; i < NUMBER_OF_NUMBERS; ++i)
+    {
+      float_vec v1 = createFloatVec();
+      float_vec v2 = createFloatVec();
+      t = clock();
+      addFloatVec(v1, v2);
+      t = clock() - t;
+      time_sum += ((double)t)/CLOCKS_PER_SEC;
+    }
+  }
+  time_sum /= 10;
+  return time_sum;
+}
+//===============================================================
+//===============================================================
 int main()
 {
-  const int NUMBER_OF_NUMBERS = 8192;
+  const int NUMBER_OF_NUMBERS = 118192;
   
   int_vec iv = createIntVec();
   float_vec fv = createFloatVec();
 
-  printf("add\n");
-  addIntVec(iv, iv);
-  addFloatVec(fv, fv);
-  printf("sub\n");
-  subIntVec(iv, iv);
-  subFloatVec(fv, fv);
-  printf("mul\n");
-  mulIntVec(iv, iv);
-  mulFloatVec(fv, fv);
-  printf("div\n");
-  divIntVec(iv, iv);
-  divFloatVec(fv, fv);
 
+//----------time.h----------------------------------
   printf("Ints adding time : %f\n", addingIntVecTime(NUMBER_OF_NUMBERS));
+  printf("Floats adding time : %f\n", addingFloatVecTime(NUMBER_OF_NUMBERS));
+
   
 }
