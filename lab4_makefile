@@ -1,0 +1,7 @@
+
+vector_operations: vector_operations.c
+	gcc -pg -o vector_operations -g vector_operations.c
+	make clean
+
+make clean:
+	rm -f *~ *.o
